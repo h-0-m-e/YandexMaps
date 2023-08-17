@@ -3,14 +3,11 @@ package ru.netology.yandexmaps.ui
 import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.MenuProvider
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -34,9 +31,10 @@ import kotlinx.coroutines.launch
 import ru.netology.yandexmaps.R
 import ru.netology.yandexmaps.databinding.FragmentMapBinding
 import ru.netology.yandexmaps.databinding.PointBinding
+import ru.netology.yandexmaps.types.PointType
 import ru.netology.yandexmaps.viewmodel.MapViewModel
 
-class MapFragment: Fragment() {
+class MapFragment : Fragment() {
 
     private var mapView: MapView? = null
 
@@ -45,8 +43,12 @@ class MapFragment: Fragment() {
         override fun onMapTap(map: Map, point: com.yandex.mapkit.geometry.Point) = Unit
 
         override fun onMapLongTap(map: Map, point: com.yandex.mapkit.geometry.Point) {
-            PointDialog.newInstance(point.latitude, point.longitude)
-                .show(childFragmentManager, null)
+            findNavController().navigate(
+                R.id.action_mapFragment_to_addPointFragment, bundleOf(
+                    LATITUDE_KEY to point.latitude,
+                    LONGITUDE_KEY to point.longitude
+                )
+            )
         }
     }
 
@@ -67,7 +69,6 @@ class MapFragment: Fragment() {
         const val LATITUDE_KEY = "LATITUDE_KEY"
         const val LONGITUDE_KEY = "LONGITUDE_KEY"
     }
-
 
 
     private val viewModel by viewModels<MapViewModel>()
@@ -116,7 +117,7 @@ class MapFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentMapBinding.inflate(inflater,container, false)
+        val binding = FragmentMapBinding.inflate(inflater, container, false)
 
         mapView = binding.map.apply {
             userLocation = MapKitFactory.getInstance().createUserLocationLayer(mapWindow)
@@ -133,6 +134,18 @@ class MapFragment: Fragment() {
                         points.forEach { point ->
                             val pointBinding = PointBinding.inflate(layoutInflater)
                             pointBinding.title.text = point.title
+                            pointBinding.type.setImageResource(
+                                when (point.pointType) {
+                                    PointType.DEFAULT -> R.drawable.location_24
+                                    PointType.ATM -> R.drawable.atm_24
+                                    PointType.BUS -> R.drawable.bus_24
+                                    PointType.CAR -> R.drawable.car_24
+                                    PointType.DINING -> R.drawable.dining_24
+                                    PointType.HOME -> R.drawable.home_24
+                                    PointType.SLEEP -> R.drawable.sleep_24
+                                    PointType.STORE -> R.drawable.store_24
+                                }
+                            )
                             collection.addPlacemark(
                                 com.yandex.mapkit.geometry.Point(point.latitude, point.longitude),
                                 ViewProvider(pointBinding.root)
@@ -145,7 +158,6 @@ class MapFragment: Fragment() {
             }
             collection.addTapListener(pointTapListener)
 
-            // Переход к точке на карте после клика на списке
             val arguments = arguments
             if (arguments != null &&
                 arguments.containsKey(LATITUDE_KEY) &&
@@ -196,21 +208,11 @@ class MapFragment: Fragment() {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.map_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                if (menuItem.itemId == R.id.list) {
-                    findNavController().navigate(R.id.action_mapFragment_to_pointsFragment)
-                    true
-                } else {
-                    false
-                }
-
-        }, viewLifecycleOwner)
-
+        binding.pointsList.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_mapFragment_to_pointsFragment
+            )
+        }
 
         return binding.root
     }

@@ -18,6 +18,8 @@ import ru.netology.yandexmaps.R
 import ru.netology.yandexmaps.adapter.PointsAdapter
 import ru.netology.yandexmaps.databinding.PointsFragmentBinding
 import ru.netology.yandexmaps.listener.OnInteractionListener
+import ru.netology.yandexmaps.ui.MapFragment.Companion.LATITUDE_KEY
+import ru.netology.yandexmaps.ui.MapFragment.Companion.LONGITUDE_KEY
 import ru.netology.yandexmaps.viewmodel.MapViewModel
 
 class PointsFragment : Fragment() {
@@ -36,8 +38,8 @@ class PointsFragment : Fragment() {
             override fun onClick(point: ru.netology.yandexmaps.dto.Point) {
                 findNavController().navigate(
                     R.id.action_pointsFragment_to_mapFragment, bundleOf(
-                        MapFragment.LATITUDE_KEY to point.latitude,
-                        MapFragment.LONGITUDE_KEY to point.longitude
+                        LATITUDE_KEY to point.latitude,
+                        LONGITUDE_KEY to point.longitude
                     )
                 )
             }
@@ -47,12 +49,13 @@ class PointsFragment : Fragment() {
             }
 
             override fun onEdit(point: ru.netology.yandexmaps.dto.Point) {
-                PointDialog.newInstance(
-                    latitude = point.latitude,
-                    longitude = point.longitude,
-                    id = point.id
-                )
-                    .show(childFragmentManager, null)
+                findNavController().navigate(R.id.action_pointsFragment_to_addPointFragment, bundleOf(
+                    AddPointFragment.LATITUDE_KEY to point.latitude,
+                    AddPointFragment.LONGITUDE_KEY to point.longitude,
+                    AddPointFragment.ID_KEY to point.id,
+                    AddPointFragment.TITLE_KEY to point.title,
+                    AddPointFragment.DESCRIPTION_KEY to point.description,
+                ))
             }
         })
 

@@ -8,4 +8,9 @@
     <string name="edit">Edit</string>
     <string name="enter_title">Enter Title</string>
     <string name="location_permission_required">Location permission required!</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="save">Save</string>
+    <string name="selector_desc">Tap on the icon to select</string>
+    <string name="title_is_empty">Title is empty!</string>
 </resources>

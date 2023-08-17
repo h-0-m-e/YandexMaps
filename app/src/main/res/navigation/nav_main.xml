@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_mapFragment_to_pointsFragment"
             app:destination="@id/pointsFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_addPointFragment"
+            app:destination="@id/addPointFragment" />
     </fragment>
     <fragment
         android:id="@+id/pointsFragment"
@@ -19,5 +22,12 @@
         <action
             android:id="@+id/action_pointsFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_pointsFragment_to_addPointFragment"
+            app:destination="@id/addPointFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/addPointFragment"
+        android:name="ru.netology.yandexmaps.ui.AddPointFragment"
+        android:label="AddPointFragment" />
 </navigation>

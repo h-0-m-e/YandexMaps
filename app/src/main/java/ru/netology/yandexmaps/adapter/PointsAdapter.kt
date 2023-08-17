@@ -1,8 +1,10 @@
 package ru.netology.yandexmaps.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +12,7 @@ import ru.netology.yandexmaps.R
 import ru.netology.yandexmaps.databinding.PointItemBinding
 import ru.netology.yandexmaps.dto.Point
 import ru.netology.yandexmaps.listener.OnInteractionListener
+import ru.netology.yandexmaps.types.PointType
 
 class PointsAdapter(
     private val onInteractionListener: OnInteractionListener,
@@ -26,24 +29,27 @@ class PointsAdapter(
 
         with(binding) {
             root.setOnClickListener {
-                val point = getItem(holder.adapterPosition)
-                onInteractionListener.onClick(point)
+                val currentPoint = getItem(holder.adapterPosition)
+                onInteractionListener.onClick(currentPoint)
             }
+
             menu.setOnClickListener {
                 PopupMenu(root.context, it).apply {
                     inflate(R.menu.point_menu)
 
                     setOnMenuItemClickListener { item ->
-                        val point = getItem(holder.adapterPosition)
+                        val currentPoint = getItem(holder.adapterPosition)
                         when (item.itemId) {
                             R.id.remove -> {
-                                onInteractionListener.onRemove(point)
+                                onInteractionListener.onRemove(currentPoint)
                                 true
                             }
+
                             R.id.edit -> {
-                                onInteractionListener.onEdit(point)
+                                onInteractionListener.onEdit(currentPoint)
                                 true
                             }
+
                             else -> false
                         }
                     }
@@ -51,6 +57,7 @@ class PointsAdapter(
                     show()
                 }
             }
+
         }
 
         return holder
@@ -67,6 +74,22 @@ class PointsAdapter(
         fun bind(point: Point) {
             with(binding) {
                 title.text = point.title
+                desc.text = point.description
+                type.setImageResource(
+                    when (point.pointType) {
+                        PointType.DEFAULT -> R.drawable.location_24
+                        PointType.ATM -> R.drawable.atm_24
+                        PointType.BUS -> R.drawable.bus_24
+                        PointType.CAR -> R.drawable.car_24
+                        PointType.DINING -> R.drawable.dining_24
+                        PointType.HOME -> R.drawable.home_24
+                        PointType.SLEEP -> R.drawable.sleep_24
+                        PointType.STORE -> R.drawable.store_24
+                    }
+                )
+                descButton.setOnClickListener {
+                    desc.isVisible = !desc.isVisible
+                }
             }
         }
     }
